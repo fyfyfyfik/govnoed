@@ -1,0 +1,10 @@
+__pycache__
+env
+config.py
+venv
+dist
+build
+program.e*
+.vscode*
+db.sqlite
+stories.json
