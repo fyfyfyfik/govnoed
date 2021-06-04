@@ -8,15 +8,12 @@ from random import choice
 from PyQt5 import QtWidgets, uic
 import config
 
-s = socket.socket()             # Create a socket object
-# Получаем порт и айпи из переменных окружения (для секьюрности)
+s = socket.socket()
 port = config.PORT
 host = config.HOST
 
-# Переменная для файла джайсон
 file = os.getcwd() + '/stories.json'
 
-# Функция для проверки валидности айпи
 def valid_ip(ip):
     try:
         ipaddress.ip_address(ip)
@@ -24,7 +21,7 @@ def valid_ip(ip):
         return False
     else:
         return True
-# Получение контента по именам из файла, например get_content('hero')
+
 def get_content(name):
     name_arr = []
     with open(file, 'r') as f:
@@ -34,7 +31,6 @@ def get_content(name):
         name_arr.append(el[name])
     return name_arr
 
-# Подключение к серверу и скачивае нового файла джейсон
 def update_base(ip):
     s.connect((ip, port))
     with open(file, 'wb') as f:
@@ -43,7 +39,6 @@ def update_base(ip):
             data = s.recv(1024)
             if not data:
                 break
-            # write data to a file
             f.write(data)
 
     f.close()
@@ -51,29 +46,23 @@ def update_base(ip):
     s.close()
     print('connection closed')
 
-# Окно приложения
 class App(QtWidgets.QMainWindow, form.Ui_MainWindow):
-    # Инициализация
     def __init__(self):
         super(App, self).__init__()
         self.setupUi(self)
-        
-        # Коннектим кнопки к нужным функциям
+
         self.pushButton.clicked.connect(self.update_hero)
         self.pushButton_2.clicked.connect(self.update_story)
         self.pushButton_3.clicked.connect(self.update_end)
         self.pushButton_4.clicked.connect(self.export_json)
         self.pushButton_5.clicked.connect(self.import_json)
         self.pushButton_6.clicked.connect(self.update_stories)
-        
 
-    # Пересобирает (отдает рандомную хар-ку героя)
     def update_hero(self):
         try:
             arr = get_content('hero')
             self.textBrowser.setText(choice(arr))
         except Exception as e:
-            # если ошибка то вылетает окошко с ошибкой
             errorWin = QtWidgets.QErrorMessage(self)
             errorWin.showMessage(f'Ошибка: \n{e}')
 
@@ -98,10 +87,8 @@ class App(QtWidgets.QMainWindow, form.Ui_MainWindow):
     
     def import_json(self):
         pass
-    
-    # Кнопка обновления локальной базы
+
     def update_stories(self):
-        # Спрашиваем у пользователя IP 
         ip, yes = QtWidgets.QInputDialog.getText(self, 'Вход', 'Введи ip сервера:')
         if yes and valid_ip(ip) or ip == 'localhost':
             try:
